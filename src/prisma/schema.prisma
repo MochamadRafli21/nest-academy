@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Options {
+  id          Int        @id @default(autoincrement())
+  value       String
+  Questions   Questions? @relation(fields: [questionsId], references: [id])
+  questionsId Int?
+}
+
+model Questions {
+  id                Int                 @id @default(autoincrement())
+  title             String
+  question          String
+  options           Options[]
+  answer            String
+  Session_Materials Session_Materials[]
+}
+
+model Materials {
+  id                Int                 @id @default(autoincrement())
+  video_url         String
+  description       String
+  Session_Materials Session_Materials[]
+}
+
+model Sessions {
+  id                Int                 @id @default(autoincrement())
+  title             String
+  Session_Materials Session_Materials[]
+}
+
+model Session_Materials {
+  id         Int        @id @default(autoincrement())
+  materialId Int?
+  questionId Int?
+  sessionId  Int
+  material   Materials? @relation(fields: [materialId], references: [id])
+  question   Questions? @relation(fields: [questionId], references: [id])
+  session    Sessions   @relation(fields: [sessionId], references: [id])
+  position   Int
+}
