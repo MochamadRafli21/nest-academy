@@ -6,45 +6,66 @@ import {
     Body,
     Put,
     Delete,
+    HttpException,
+    HttpStatus,
   } from '@nestjs/common';
   import { QuestionsService } from './questions.service';
-  import { Questions as QuestionsModel } from '@prisma/client';
+  import { Questions as QuestionsModel, Prisma } from '@prisma/client';
   
-  @Controller()
-  export class AppController {
+  @Controller('questions')
+  export class QuestionsController {
     constructor(
       private readonly questionsService: QuestionsService,
     ) {}
-  
-    @Get(':id')
-    async getPostById(@Param('id') id: string): Promise<QuestionsModel> {
-      return this.questionsService.question({ id: Number(id) });
+
+    @Get()
+    async getQuestions(): Promise<QuestionsModel[]> {
+      const data = this.questionsService.questions();
+      return data
     }
   
+    @Get(':id')
+    async getQuestion(@Param('id') id: string): Promise<any> {
+      const data = this.questionsService.question({ id: Number(id) });
+      if (data === null){
+        throw new HttpException ("Question not found", HttpStatus.NOT_FOUND)
+      }
+
+      return data
+    }
+
     @Post()
-    async createDraft(
-      @Body() postData: { title: string; content?: string; authorEmail: string },
+    async createQuestions(
+      @Body() questionsData: { title:string, question:string, answer:string , options: Prisma.OptionsCreateManyQuestionsInput},
     ): Promise<QuestionsModel> {
-      const { title, content, authorEmail } = postData;
+      const { title, question, options, answer } = questionsData;
       return this.questionsService.createQuestion({
         title,
-        content,
-        author: {
-          connect: { email: authorEmail },
+        question,
+        options: {
+          createMany:{
+            data: options
+          }
         },
+        answer
       });
     }
 
   
     @Put(':id')
-    async publishPost(@Param('id') id: string, @Body() postData: { options: string[], answer:string}): Promise<QuestionsModel> {
-        // todo create options 
-
+    async editQuestion(@Param('id') id: string, @Body() questionsData: { title:string, question:string, answer:string , options: Prisma.OptionsCreateManyQuestionsInput}): Promise<QuestionsModel> {
+      await this.questionsService.deleteRelatedOptions(Number(id))
       return this.questionsService.updateQuestion({
         where: { id: Number(id) },
         data: { 
-            answer: postData.answer,
-            options:[1,2]
+          title: questionsData.title,
+          question: questionsData.question,
+          options: {
+            createMany:{
+              data: questionsData.options
+            }
+          },
+          answer:questionsData.answer
          },
       });
     }

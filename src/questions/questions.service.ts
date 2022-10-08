@@ -11,30 +11,29 @@ export class QuestionsService {
   ): Promise<Questions | null> {
     return this.prisma.questions.findUnique({
       where: questionsWhereUniqueInput,
+      include:{
+        options:true
+      }
     });
   }
 
-  async questions(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.QuestionsWhereUniqueInput;
-    where?: Prisma.QuestionsWhereInput;
-    orderBy?: Prisma.QuestionsOrderByWithRelationInput;
-  }): Promise<Questions[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.questions.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
+  async questions(): Promise<Questions[]> {
+    return this.prisma.questions.findMany({});
   }
 
   async createQuestion(data: Prisma.QuestionsCreateInput): Promise<Questions> {
-    return this.prisma.questions.create({
+    let result =this.prisma.questions.create({
       data,
+      include:{
+        options: true,
+        Quiz:false
+      }
     });
+    if(!result){
+      throw new console.error("create failed");
+    }
+
+    return result;
   }
 
   async updateQuestion(params: {
@@ -42,9 +41,21 @@ export class QuestionsService {
     data: Prisma.QuestionsUpdateInput;
   }): Promise<Questions> {
     const { data, where } = params;
+
     return this.prisma.questions.update({
       data,
       where,
+      include:{
+        options: true
+      }
+    });
+  }
+
+  async deleteRelatedOptions(id: number): Promise<Prisma.BatchPayload> {
+    return this.prisma.options.deleteMany({
+      where: {
+        questionsId:id
+      }
     });
   }
 
