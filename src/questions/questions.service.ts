@@ -12,7 +12,8 @@ export class QuestionsService {
     return this.prisma.questions.findUnique({
       where: questionsWhereUniqueInput,
       include:{
-        options:true
+        options: true,
+        section: true,
       }
     });
   }
@@ -26,7 +27,7 @@ export class QuestionsService {
       data,
       include:{
         options: true,
-        Quiz:false
+        section: true
       }
     });
     if(!result){
@@ -46,7 +47,8 @@ export class QuestionsService {
       data,
       where,
       include:{
-        options: true
+        options: true,
+        section: true
       }
     });
   }

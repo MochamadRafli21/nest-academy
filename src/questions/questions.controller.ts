@@ -10,7 +10,8 @@ import {
     HttpStatus,
   } from '@nestjs/common';
   import { QuestionsService } from './questions.service';
-  import { Questions as QuestionsModel, Prisma } from '@prisma/client';
+  import { Questions as QuestionsModel } from '@prisma/client';
+  import { CreateQuestionsDto } from './dto/questions-create.dto';
   
   @Controller('questions')
   export class QuestionsController {
@@ -36,12 +37,16 @@ import {
 
     @Post()
     async createQuestions(
-      @Body() questionsData: { title:string, question:string, answer:string , options: Prisma.OptionsCreateManyQuestionsInput},
-    ): Promise<QuestionsModel> {
-      const { title, question, options, answer } = questionsData;
+      @Body() questionsData: CreateQuestionsDto ): Promise<QuestionsModel> {
+      const { title, sections, options, answer } = questionsData;
+      console.log(sections)
       return this.questionsService.createQuestion({
         title,
-        question,
+        section:{
+          createMany:{
+            data: sections
+          }
+        },
         options: {
           createMany:{
             data: options
@@ -53,13 +58,17 @@ import {
 
   
     @Put(':id')
-    async editQuestion(@Param('id') id: string, @Body() questionsData: { title:string, question:string, answer:string , options: Prisma.OptionsCreateManyQuestionsInput}): Promise<QuestionsModel> {
+    async editQuestion(@Param('id') id: string, @Body() questionsData: CreateQuestionsDto): Promise<QuestionsModel> {
       await this.questionsService.deleteRelatedOptions(Number(id))
       return this.questionsService.updateQuestion({
         where: { id: Number(id) },
         data: { 
           title: questionsData.title,
-          question: questionsData.question,
+          section: {
+            createMany:{
+              data: questionsData.sections
+            }
+          },
           options: {
             createMany:{
               data: questionsData.options

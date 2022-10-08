@@ -10,28 +10,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model Options {
   id          Int        @id @default(autoincrement())
   value       String
+  option_name option_name @default(A)
   Questions   Questions? @relation(fields: [questionsId], references: [id])
   questionsId Int?
 }
 
+enum option_name {
+  A
+  B
+  C
+  D
+  E
+}
+// 5 options urutan selalu sama a-e
+// timer per second
+// quiz builder 
 model Quiz {
   id                 Int                  @id @default(autoincrement())
   name               String
   question           Questions[]
+  timeout            Int
   Sessions_Materials Sessions_Materials[]
 }
 
+model Sections {
+  id  Int @id @default(autoincrement())
+  question Questions @relation(fields: [questionId], references: [id])
+  questionId Int
+  type section_type @default(PARAGRAPH)
+  paragraph String?
+  image_url String?
+  video_url String?
+  position Int
+}
+
+enum section_type {
+  PARAGRAPH
+  VIDEO
+  IMAGE
+}
+
+// user-score
+// get average score
+// storage img dan video pakai youtube dan gdrive
+// quiz builder support table, rumus dan image
 model Questions {
   id       Int       @id @default(autoincrement())
   title    String
-  question String
   options  Options[]
   answer   String
   Quiz     Quiz?     @relation(fields: [quizId], references: [id])
   quizId   Int?
+  section Sections[]
 }
 
 model Materials {
@@ -40,11 +74,11 @@ model Materials {
   description        String
   Sessions_Materials Sessions_Materials[]
 }
-
+// matery quiz dan qna
 model Sessions {
   id    Int    @id @default(autoincrement())
   title String
-
+  student User_Session[]
   Sessions_Materials Sessions_Materials[]
 }
 
@@ -58,4 +92,23 @@ model Sessions_Materials {
   materialsId Int
   positions   Int
   sessionsId  Int
+}
+
+model User{
+  id Int  @id @default(autoincrement())
+  email String @unique
+  fullname String
+  password String
+  is_in_sessions Boolean @default(false)
+  sessionId String?
+  is_admin Boolean @default(false)
+  user_session User_Session[]
+}
+
+model User_Session{
+  id          Int @id @default(autoincrement())
+  session     Sessions   @relation(fields: [sessionsId], references: [id])
+  sessionsId  Int
+  student User @relation(fields: [userId], references: [id])
+  userId Int
 }
