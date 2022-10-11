@@ -11,7 +11,7 @@ import {
   } from '@nestjs/common';
   import { QuestionsService } from './questions.service';
   import { Questions as QuestionsModel } from '@prisma/client';
-  import { CreateQuestionsDto } from './dto/questions-create.dto';
+  import { CreateQuestionsDto } from '../dto/questions-create.dto';
   
   @Controller('questions')
   export class QuestionsController {
