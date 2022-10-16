@@ -1,18 +1,9 @@
 import {
-    ArrayMaxSize,
-    ArrayMinSize,
-      IsArray,
     IsEnum,
-    IsDefined,
-    IsNotEmptyObject,
     IsNotEmpty,
-    IsObject,
     IsString,
-    ValidateNested,
     IsEmail
   } from 'class-validator';
-  import { Type } from 'class-transformer';
-  import { Prisma } from '@prisma/client';
   
   export enum sections_type{
       PARAGRAPH= 'PARAGRAPH',
@@ -55,7 +46,5 @@ import {
       @IsString()
       @IsNotEmpty()
       readonly password: string;
-      @IsString()
-      @IsNotEmpty()
       readonly sessionId: string;
   }

@@ -15,8 +15,8 @@ export class AuthService {
     private utilsService:utilsService
     ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOne(email);
     if (!user){
       throw new HttpException ("User not found", HttpStatus.NOT_FOUND)
     }
@@ -29,6 +29,7 @@ export class AuthService {
   }
 
   async login(user:any){
+    console.log(user)
     const payload = { email:user.email, sub: user.id}
     return {
       access_token: this.jwtService.sign(payload)

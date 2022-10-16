@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { 
+  Injectable,
+  HttpException,
+  HttpStatus,
+ } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
 import { utilsService } from 'src/utils/utils';
@@ -11,21 +15,36 @@ export class UsersService {
       private utils: utilsService
       ) {}
 
-    async createUser(data: Prisma.UserCreateInput): Promise<User> {
+    async createUser(data: Prisma.UserCreateInput): Promise<{
+      email: string, fullname: string
+    } > {
       const hashedPass = await this.utils.encrypt(data.password)
-        let result =this.prisma.user.create({
+      try {
+        const result = await this.prisma.user.create({
           data:{
             email : data.email, 
             fullname: data.fullname,
             password: hashedPass
-          }
-
+          },
+          select: {
+            email: true,
+            fullname:true,
+            password:false
+          },
         });
         if(!result){
-          throw new console.error("create failed");
+          throw new HttpException ("User Cant Be created", HttpStatus.BAD_REQUEST)
         }
 
         return result;
+        
+      } catch (error) {
+        if(error.code === "P2002"){
+          throw new HttpException ("Email Is Used", HttpStatus.CONFLICT)
+        }else{
+          throw new HttpException ("User Cant Be created", HttpStatus.BAD_REQUEST)
+        }
+      }
       }
     
       async findOne(email: string): Promise<User | undefined> {

@@ -39,7 +39,6 @@ import {
     async createQuestions(
       @Body() questionsData: CreateQuestionsDto ): Promise<QuestionsModel> {
       const { title, sections, options, answer } = questionsData;
-      console.log(sections)
       return this.questionsService.createQuestion({
         title,
         section:{

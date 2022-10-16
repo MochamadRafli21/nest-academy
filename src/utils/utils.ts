@@ -1,12 +1,10 @@
 import { createCipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 import { createDecipheriv } from 'crypto';
-import {constant} from './utils.constant'
 
 export class utilsService {
     constructor(
         private readonly iv = randomBytes(16),
-        private readonly password = constant.password,
     ) {}
 
    async encrypt(text:string):Promise<string> {
@@ -14,7 +12,7 @@ export class utilsService {
 
     // The key length is dependent on the algorithm.
     // In this case for aes256, it is 32 bytes.
-    const key = (await promisify(scrypt)(this.password, 'salt', 32)) as Buffer;
+    const key = (await promisify(scrypt)(process.env.PASSWORD, 'salt', 32)) as Buffer;
     const cipher = createCipheriv('aes-256-ctr', key, this.iv);
 
     const encryptedText = Buffer.concat([
@@ -27,7 +25,7 @@ export class utilsService {
 
    async decrypt(encryptedText:string):Promise<string>{
     const encryptedBuffer =Buffer.from(encryptedText, 'utf8')
-    const key = (await promisify(scrypt)(this.password, 'salt', 32)) as Buffer;
+    const key = (await promisify(scrypt)(process.env.PASSWORD, 'salt', 32)) as Buffer;
 
     const decipher = createDecipheriv('aes-256-ctr', key, this.iv);
     const decryptedText = Buffer.concat([

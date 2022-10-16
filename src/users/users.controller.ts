@@ -16,13 +16,17 @@ export class UsersController {
 
     @Post()
     async createQuestions(
-      @Body() questionsData: CreateUserDto ): Promise<UsersModel> {
+      @Body() questionsData: CreateUserDto ): Promise<string> {
       const { email, fullname, password } = questionsData;
-      return this.userService.createUser({
+      const result = await this.userService.createUser({
         email,
         fullname,
         password,
       });
+
+      console.log(result)      
+
+      return "success"
     }
 
 }
