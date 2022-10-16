@@ -1,11 +1,12 @@
 import { createCipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 import { createDecipheriv } from 'crypto';
+import {constant} from './utils.constant'
 
 export class utilsService {
     constructor(
         private readonly iv = randomBytes(16),
-        private readonly password = "password",
+        private readonly password = constant.password,
     ) {}
 
    async encrypt(text:string):Promise<string> {

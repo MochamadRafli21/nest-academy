@@ -29,15 +29,11 @@ export class UsersService {
       }
     
       async findOne(email: string): Promise<User | undefined> {
-        let res = await this.prisma.user.findUnique({
+        return await this.prisma.user.findUnique({
           where:{
             email
           },
         }
         );
-
-        res.password = await this.utils.decrypt(res.password);
-
-        return res
       }
 }
