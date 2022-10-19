@@ -5,26 +5,23 @@ import {
  } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
-import { utilsService } from 'src/utils/utils';
 
 
 @Injectable()
 export class UsersService {
     constructor(
       private prisma: PrismaService,
-      private utils: utilsService
       ) {}
 
     async createUser(data: Prisma.UserCreateInput): Promise<{
       email: string, fullname: string
     } > {
-      const hashedPass = await this.utils.encrypt(data.password)
       try {
         const result = await this.prisma.user.create({
           data:{
             email : data.email, 
             fullname: data.fullname,
-            password: hashedPass
+            password: data.password
           },
           select: {
             email: true,

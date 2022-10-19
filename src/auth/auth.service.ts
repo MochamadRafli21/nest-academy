@@ -20,17 +20,16 @@ export class AuthService {
     if (!user){
       throw new HttpException ("User not found", HttpStatus.NOT_FOUND)
     }
-    const decryptedText = await this.utilsService.decrypt(user.password)
-    if (user && decryptedText === pass) {
+    if (user && user.password === pass) {
       const { password, ...result } = user;
       return result;
     }
     return null;
   }
 
-  async login(user:any){
-    console.log(user)
-    const payload = { email:user.email, sub: user.id}
+  async login(data:any){
+    const user = await this.usersService.findOne(data.email);
+    const payload = { username:user.fullname, sub: user.id}
     return {
       access_token: this.jwtService.sign(payload)
     }
