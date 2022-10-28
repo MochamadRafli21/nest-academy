@@ -54,15 +54,21 @@ export class CreateQuestionsDto {
     @IsObject()
     @Type(() => SectionsCreateManyInputDto)
     readonly sections: SectionsCreateManyInputDto[];
-    @IsArray()
-    @ArrayMinSize(5)
-    @ArrayMaxSize(5)
-    @ValidateNested({ each: true })
-    @IsDefined()
-    @IsNotEmptyObject()
-    @IsObject()
-    @Type(() => OptionsCreateManyInputDto)
-    readonly options: OptionsCreateManyInputDto[];
+    @IsString()
+    @IsNotEmpty()
+    readonly options_a: string;
+    @IsString()
+    @IsNotEmpty()
+    readonly options_b: string;
+    @IsString()
+    @IsNotEmpty()
+    readonly options_c: string;
+    @IsString()
+    @IsNotEmpty()
+    readonly options_d: string;
+    @IsString()
+    @IsNotEmpty()
+    readonly options_e: string;
     @IsString()
     readonly answer: string;
 }

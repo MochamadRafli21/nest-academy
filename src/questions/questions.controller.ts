@@ -8,10 +8,13 @@ import {
     Delete,
     HttpException,
     HttpStatus,
+    UseGuards
   } from '@nestjs/common';
   import { QuestionsService } from './questions.service';
   import { Questions as QuestionsModel } from '@prisma/client';
   import { CreateQuestionsDto } from '../dto/questions-create.dto';
+  import { JwtAuthGuard } from '../auth/jwt-authguard';
+
   
   @Controller('questions')
   export class QuestionsController {
@@ -19,12 +22,14 @@ import {
       private readonly questionsService: QuestionsService,
     ) {}
 
+    @UseGuards(JwtAuthGuard)
     @Get()
     async getQuestions(): Promise<QuestionsModel[]> {
       const data = this.questionsService.questions();
       return data
     }
   
+    @UseGuards(JwtAuthGuard)
     @Get(':id')
     async getQuestion(@Param('id') id: string): Promise<any> {
       const data = this.questionsService.question({ id: Number(id) });
@@ -35,10 +40,11 @@ import {
       return data
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post()
     async createQuestions(
       @Body() questionsData: CreateQuestionsDto ): Promise<QuestionsModel> {
-      const { title, sections, options, answer } = questionsData;
+      const { title, sections, options_a, options_b, options_c, options_d, options_e , answer } = questionsData;
       return this.questionsService.createQuestion({
         title,
         section:{
@@ -46,19 +52,18 @@ import {
             data: sections
           }
         },
-        options: {
-          createMany:{
-            data: options
-          }
-        },
+        options_a,
+        options_b,
+        options_c,
+        options_d,
+        options_e,
         answer
       });
     }
 
-  
+    @UseGuards(JwtAuthGuard)
     @Put(':id')
     async editQuestion(@Param('id') id: string, @Body() questionsData: CreateQuestionsDto): Promise<QuestionsModel> {
-      await this.questionsService.deleteRelatedOptions(Number(id))
       return this.questionsService.updateQuestion({
         where: { id: Number(id) },
         data: { 
@@ -68,16 +73,17 @@ import {
               data: questionsData.sections
             }
           },
-          options: {
-            createMany:{
-              data: questionsData.options
-            }
-          },
+          options_a:questionsData.options_a,
+          options_b:questionsData.options_b,
+          options_c:questionsData.options_c,
+          options_d:questionsData.options_d,
+          options_e:questionsData.options_e,
           answer:questionsData.answer
          },
       });
     }
   
+    @UseGuards(JwtAuthGuard)
     @Delete(':id')
     async deletePost(@Param('id') id: string): Promise<QuestionsModel> {
       return this.questionsService.deleteQuestion({ id: Number(id) });

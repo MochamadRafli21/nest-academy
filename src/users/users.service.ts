@@ -44,12 +44,21 @@ export class UsersService {
       }
       }
     
-      async findOne(email: string): Promise<User | undefined> {
-        return await this.prisma.user.findUnique({
+      async findOne(email: string): Promise<any> {
+        const user = await this.prisma.user.findUnique({
           where:{
             email
-          },
+          }
+        })
+        return user
+      }
+
+      async verifyAdmin(email:string): Promise<Boolean>{
+        const user = await this.findOne(email)
+
+        if(user?.is_admin === true){
+          return true
         }
-        );
+        return false
       }
 }

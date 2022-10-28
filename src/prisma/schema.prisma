@@ -10,22 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model Options {
-  id          Int        @id @default(autoincrement())
-  value       String
-  option_name option_name @default(A)
-  Questions   Questions? @relation(fields: [questionsId], references: [id])
-  questionsId Int?
-}
-
-enum option_name {
-  A
-  B
-  C
-  D
-  E
-}
 // 5 options urutan selalu sama a-e
 // timer per second
 // quiz builder 
@@ -61,7 +45,11 @@ enum section_type {
 model Questions {
   id       Int       @id @default(autoincrement())
   title    String
-  options  Options[]
+  options_a String
+  options_b String
+  options_c String
+  options_d String
+  options_e String
   answer   String
   Quiz     Quiz?     @relation(fields: [quizId], references: [id])
   quizId   Int?

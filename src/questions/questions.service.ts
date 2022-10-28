@@ -12,7 +12,6 @@ export class QuestionsService {
     return this.prisma.questions.findUnique({
       where: questionsWhereUniqueInput,
       include:{
-        options: true,
         section: true,
       }
     });
@@ -26,7 +25,6 @@ export class QuestionsService {
     let result =this.prisma.questions.create({
       data,
       include:{
-        options: true,
         section: true
       }
     });
@@ -47,16 +45,7 @@ export class QuestionsService {
       data,
       where,
       include:{
-        options: true,
         section: true
-      }
-    });
-  }
-
-  async deleteRelatedOptions(id: number): Promise<Prisma.BatchPayload> {
-    return this.prisma.options.deleteMany({
-      where: {
-        questionsId:id
       }
     });
   }
